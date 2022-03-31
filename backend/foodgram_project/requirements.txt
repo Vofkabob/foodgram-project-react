@@ -1,0 +1,7 @@
+Django==2.2.16
+django-filter==21.1
+drf-extra-fields==3.4.0
+djoser==2.1.0
+reportlab==3.6.9
+psycopg2==2.9.3
+djangorestframework_simplejwt==4.8.0
