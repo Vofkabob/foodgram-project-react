@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-from datetime import timedelta 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
+    'django_extensions',
     'djoser',
     'rest_framework.authtoken',
     'rest_framework',
@@ -77,24 +77,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram_project.wsgi.application'
 
 
-#DJOSER = {
-    #'LOGIN_FIELD': 'username',
-    #'USER_ID_FIELD': 'id',
-    #'HIDE_USERS': False,
-    #'PERMISSIONS': {
-        #'user': ['rest_framework.permissions.IsAuthenticated'],
-        #'user_list': ['rest_framework.permissions.AllowAny']
-    #},
-    #'SERIALIZERS': {
-        #'user_create': 'users.serializers.CustomUserCreateSerializer',
-        #'user': 'users.serializers.CustomUserSerializer',
-        #'current_user': 'users.serializers.CustomUserSerializer',
-    #},
-#}
-
-
-
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -116,7 +98,6 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
@@ -124,9 +105,18 @@ REST_FRAMEWORK = {
 }
 
 
-SIMPLE_JWT = { 
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=10), 
-    'AUTH_HEADER_TYPES': ('Bearer',), 
+DJOSER = {
+    'LOGIN_FIELD': 'username',
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.AllowAny']
+    },
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+    },
 }
 
 

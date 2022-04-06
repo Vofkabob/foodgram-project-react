@@ -3,8 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'password']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'password']
     email = models.EmailField(
         verbose_name='Email',
         unique=True
@@ -19,17 +19,17 @@ class User(AbstractUser):
 
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='follower')
-    following = models.ForeignKey(User, on_delete=models.CASCADE,
-                                  related_name='following')
+                             related_name='followers')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               related_name='following')
 
     def __str__(self):
-        return f'{self.user} подписался на {self.following}.'
+        return f'{self.user} подписался на {self.author}.'
 
     class Meta:
         verbose_name = 'Подписчик'
         verbose_name_plural = 'Подписчики'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'following'], name='unique_follow')
+                fields=['user', 'author'], name='unique_follow')
         ]

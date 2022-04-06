@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from djoser.conf import settings
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Recipe
+from .models import Follow
 from rest_framework import serializers
 
 
@@ -10,18 +11,18 @@ User = get_user_model()
 
 
 class CustomUserSerializer(UserSerializer):
-    follower = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
 
-    def get_follower(self, obj):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return obj.follower.filter(follower=request.user).exists()
+        return obj.following.filter(user=request.user).exists()
 
     class Meta:
         model = User
-        fields = (settings.USER_ID_FIELD, settings.LOGIN_FIELD, 
-            'email', 'first_name', 'last_name', 'follower')
+        fields = (settings.LOGIN_FIELD,
+                  'email', 'first_name', 'last_name', 'is_subscribed')
         read_only_fields = (settings.LOGIN_FIELD, )
 
 
@@ -30,7 +31,6 @@ class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
         fields = tuple(User.REQUIRED_FIELDS) + (
-            settings.USER_ID_FIELD,
             settings.LOGIN_FIELD,
             'first_name',
             'last_name',
@@ -54,11 +54,16 @@ class FollowSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     recipes = RecipeSerializer(many=True)
-    follower = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField()
     count = serializers.IntegerField(read_only=True)
 
     def get_follower(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
-        return obj.follower.filter(follower=request.user).exists()
+        return obj.following.filter(user=request.user).exists()
+
+    class Meta:
+        model = Follow
+        fields = ('username', 'id',  'first_name', 'last_name', 'email',
+                  'is_subscribed', 'recipes', 'count')

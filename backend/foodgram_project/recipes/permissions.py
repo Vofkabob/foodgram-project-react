@@ -11,7 +11,7 @@ class Superuser(BasePermission):
 class Author(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.method not in ['PUT', 'DELETE']:
+        if request.method not in ['PUT', 'DELETE', 'PATCH']:
             return True
         return obj.author == request.user
 
