@@ -10,16 +10,17 @@ from reportlab.pdfgen.canvas import Canvas
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status, viewsets, mixins, generics, views
+from rest_framework import status, viewsets, generics, views
 
 from .filters import RecipeFilterSet, CustomSearchFilter
-from .models import (Recipe, Tag, Ingredient, Favourite,
-                     ShoppingCart, IngredientForRecipe)
+from .models import (Tag, Ingredient, Recipe, IngredientForRecipe,
+                     Favourite, ShoppingCart)
 from .permissions import Author, ReadOnly
-from .serializers import (RecipeSerializer, TagSerializer,
+from .serializers import (TagSerializer, IngredientSerializer,
+                          RecipeSerializer,
                           IngredientForRecipeSerializer,
-                          RecipeFollowSerializer,
-                          IngredientSerializer)
+                          RecipeFollowSerializer)
+from .mixins import ListRetriveViewSet
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -83,10 +84,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeFollowSerializer
 
 
-class IngredientsViewSet(mixins.ListModelMixin,
-                         mixins.RetrieveModelMixin,
-                         viewsets.GenericViewSet):
-
+class IngredientsViewSet(ListRetriveViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = [CustomSearchFilter, ]
@@ -99,9 +97,7 @@ class IngredientsAmountView(generics.ListAPIView):
     serializer_class = IngredientForRecipeSerializer
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 viewsets.GenericViewSet):
+class TagViewSet(ListRetriveViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None

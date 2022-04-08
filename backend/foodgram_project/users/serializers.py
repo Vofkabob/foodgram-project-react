@@ -13,17 +13,17 @@ User = get_user_model()
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
-            return False
-        return obj.following.filter(user=request.user).exists()
-
     class Meta:
         model = User
         fields = (settings.LOGIN_FIELD,
                   'email', 'first_name', 'last_name', 'is_subscribed')
         read_only_fields = (settings.LOGIN_FIELD, )
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request or request.user.is_anonymous:
+            return False
+        return obj.following.filter(user=request.user).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -57,13 +57,13 @@ class FollowSerializer(serializers.Serializer):
     is_subscribed = serializers.SerializerMethodField()
     count = serializers.IntegerField(read_only=True)
 
+    class Meta:
+        model = Follow
+        fields = ('username', 'id',  'first_name', 'last_name', 'email',
+                  'is_subscribed', 'recipes', 'count')
+
     def get_follower(self, obj):
         request = self.context.get('request')
         if not request or request.user.is_anonymous:
             return False
         return obj.following.filter(user=request.user).exists()
-
-    class Meta:
-        model = Follow
-        fields = ('username', 'id',  'first_name', 'last_name', 'email',
-                  'is_subscribed', 'recipes', 'count')

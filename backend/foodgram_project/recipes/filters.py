@@ -14,10 +14,10 @@ class RecipeFilterSet(FilterSet):
         queryset=Tag.objects.all(),
         to_field_name='slug')
     is_favourited = filters.BooleanFilter(
-        label="Favourited",
+        label='Favourited',
         method='filter_is_favourite')
     is_in_shopping_list = filters.BooleanFilter(
-        label="Is in shopping list",
+        label='Is in shopping list',
         method='filter_is_in_shopping_list')
 
     class Meta:
@@ -36,4 +36,4 @@ class RecipeFilterSet(FilterSet):
 
 
 class CustomSearchFilter(SearchFilter):
-    search_param = "name"
+    search_param = 'name'

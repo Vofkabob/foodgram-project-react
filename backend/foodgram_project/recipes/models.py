@@ -49,15 +49,17 @@ class Recipe(models.Model):
     image = models.ImageField(verbose_name='Картинка')
     author = models.ForeignKey(User, on_delete=models.SET_NULL,
                                null=True, verbose_name='Автор')
+    '''При удалении автора, рецепт может остаться.
+    Ему будет присвоен автор Null.'''
     pub_date = models.DateTimeField('Дата создания', auto_now_add=True)
-
-    def __str__(self):
-        return self.name
 
     class Meta:
         ordering = ['-pub_date']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
+    def __str__(self):
+        return self.name
 
 
 class IngredientForRecipe(models.Model):
@@ -72,9 +74,12 @@ class IngredientForRecipe(models.Model):
                     (1, 'Количество не может быть меньше 1.')])
 
     class Meta:
-        unique_together = ('ingredient', 'recipe')
         verbose_name = 'Количество ингредиентов в рецепте'
         verbose_name_plural = 'Количество ингредиентов в рецептах'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'], name='unique_recipe')
+        ]
 
 
 class Favourite(models.Model):
@@ -87,13 +92,16 @@ class Favourite(models.Model):
                                related_name='favourites',
                                null=True, blank=True)
 
-    def __str__(self):
-        return f'{self.user} добавил {self.recipe} в избранное.'
-
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
-        unique_together = ('user', 'recipe')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_favourite')
+        ]
+
+    def __str__(self):
+        return f'{self.user} добавил {self.recipe} в избранное.'
 
 
 class ShoppingCart(models.Model):
@@ -107,3 +115,7 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_shoppin_cart')
+        ]

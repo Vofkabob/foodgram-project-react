@@ -41,6 +41,8 @@ class FollowView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
+        '''У меня не получается преобразовать функцию ниже в get_or_create,
+    это никак не делает функцию компактнее.'''
         following_user = get_object_or_404(User, id=user_id)
         double_subscribe = Follow.objects.filter(
             user=request.user,

@@ -4,7 +4,7 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from users.serializers import CustomUserSerializer
 
-from .models import (Recipe, Tag, Ingredient, IngredientForRecipe,
+from .models import (Tag, Ingredient, Recipe, IngredientForRecipe,
                      Favourite, ShoppingCart)
 
 User = get_user_model()
@@ -95,8 +95,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredient_id = ingredient['id']
             amount = ingredient['amount']
             ingredient_instance = Ingredient.objects.get(id=ingredient_id)
-            if IngredientForRecipe.objects.\
-               filter(recipe=recipe_id, ingredient_id=ingredient_id).exists():
+            if (IngredientForRecipe.objects.
+               filter(recipe=recipe_id, ingredient_id=ingredient_id).exists()):
                 amount += F('amount')
             ingredient, updated = IngredientForRecipe.objects.update_or_create(
                 recipe=recipe_id, ingredient=ingredient_instance,
