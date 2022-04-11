@@ -17,7 +17,7 @@ urlpatterns = [
         name='shopping_cart'
     ),
     path(
-        'recipes/<recipe_id>/favourite/',
+        'recipes/<recipe_id>/favorite/',
         FavouriteShoppingCartView.as_view(),
         name='favourite'
     ),

@@ -41,12 +41,10 @@ class FollowView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        '''У меня не получается преобразовать функцию ниже в get_or_create,
-    это никак не делает функцию компактнее.'''
-        following_user = get_object_or_404(User, id=user_id)
+        subscribe_user = get_object_or_404(User, id=user_id)
         double_subscribe = Follow.objects.filter(
             user=request.user,
-            author=following_user
+            subscribe=subscribe_user
         ).exists()
         if request.user.id == int(user_id):
             error = {'errors': 'Невозможно подписаться на самого себя'}
@@ -56,23 +54,23 @@ class FollowView(views.APIView):
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
         Follow.objects.create(
             user=request.user,
-            author=following_user
+            subscribe=subscribe_user
         )
         serializer = FollowSerializer(
-            following_user,
+            subscribe_user,
             context={'request': request}
         )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, user_id):
-        following_user = get_object_or_404(User, id=user_id)
+        subscribe_user = get_object_or_404(User, id=user_id)
         try:
-            author = Follow.objects.get(
+            subscribe = Follow.objects.get(
                 user=request.user,
-                author=following_user
+                subscribe=subscribe_user
             )
         except ObjectDoesNotExist:
             error = {'errors': 'Вы не подписаны на этого пользователя'}
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        author.delete()
+        subscribe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

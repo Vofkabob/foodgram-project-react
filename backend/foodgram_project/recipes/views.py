@@ -1,5 +1,3 @@
-import itertools
-
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework import DjangoFilterBackend
@@ -45,30 +43,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 else:
                     ingredients_dict[key] += ingredients_amount
         return ingredients_dict
-
-    @action(detail=False, methods=['GET'],
-            permission_classes=[IsAuthenticated],)
+    
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        user_recipes = Recipe.objects.filter(purchases__user=request.user)
-        if not user_recipes:
-            error = {'errors': 'Список рецептов пуст'}
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
-        ingredients = self.get_shopping_cart(user_recipes)
+        final_list = {}
+        ingredients = Recipe.objects.filter(
+            purchases__user=request.user).values_list(
+            'ingredients__name', 'ingredients__measurement_unit',
+            'ingredients_amount')
+        for item in ingredients:
+            name = item[0]
+            if name not in final_list:
+                final_list[name] = {
+                    'measurement_unit': item[1],
+                    'ingredients_amount': item[2]
+                }
+            else:
+                final_list[name]['ingredients_amount'] += item[2]
+        pdfmetrics.registerFont(
+            TTFont('FreeSans', 'media/fonts/FreeSans.ttf'))
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
-                                           'filename="shopping_cart.pdf"')
-        canvas = Canvas(response)
-        pdfmetrics.registerFont(TTFont('FontPDF', 'FontPDF.otf'))
-        canvas.setFont('FontPDF', 50)
-        canvas.drawString(100, 750, 'Список покупок:')
-        canvas.setFont('FontPDF', 30)
-        counter = itertools.count(650, -50)
-        for k, v in ingredients.items():
-            if int(round(v, 2) % 1 * 100) == 0:
-                v = int(v)
-            height = next(counter)
-            canvas.drawString(50, height, f'-  {k} - {v}')
-        canvas.save()
+                                           'filename="shopping_list.pdf"')
+        page = Canvas(response)
+        page.setFont('FreeSans', size=24)
+        page.drawString(200, 800, 'Список ингредиентов')
+        page.setFont('FreeSans', size=16)
+        height = 750
+        for i, (name, data) in enumerate(final_list.items(), 1):
+            page.drawString(75, height, (f'<{i}> {name} - {data["ingredients_amount"]}, '
+                                         f'{data["measurement_unit"]}'))
+            height -= 25
+        page.showPage()
+        page.save()
         return response
 
     def get_permissions(self):

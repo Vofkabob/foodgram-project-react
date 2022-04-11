@@ -47,10 +47,8 @@ class Recipe(models.Model):
         validators=[MinValueValidator
                     (1, 'Время приготовления не может быть меньше минуты.')])
     image = models.ImageField(verbose_name='Картинка')
-    author = models.ForeignKey(User, on_delete=models.SET_NULL,
-                               null=True, verbose_name='Автор')
-    '''При удалении автора, рецепт может остаться.
-    Ему будет присвоен автор Null.'''
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               verbose_name='Автор')
     pub_date = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
