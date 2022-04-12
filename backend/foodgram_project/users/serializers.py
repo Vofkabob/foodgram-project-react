@@ -26,7 +26,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = (settings.LOGIN_FIELD,
+        fields = (settings.LOGIN_FIELD, 'id',
                   'username', 'first_name', 'last_name', 'is_subscribed')
         read_only_fields = (settings.LOGIN_FIELD, )
 
