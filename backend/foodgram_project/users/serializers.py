@@ -2,10 +2,10 @@ from drf_extra_fields.fields import Base64ImageField
 from djoser.conf import settings
 from djoser.serializers import (
     UserCreateSerializer as BaseUserRegistrationSerializer)
-from django.shortcuts import get_object_or_404
+from rest_framework import serializers, validators
+
 from recipes.models import Recipe
 from .models import Follow, User
-from rest_framework import serializers, validators
 
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
@@ -83,7 +83,7 @@ class FollowListSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed', 'recipes', 'recipes_count',)
-    
+
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
@@ -93,18 +93,5 @@ class FollowListSerializer(serializers.ModelSerializer):
             user=user,
             subscriptions=obj).exists()
 
-    def get_recipes(self, obj):
-        request = self.context['request']
-        query_params = request.query_params.get('recipes_limit')
-        recipes_count = Recipe.objects.filter(author=obj).count()
-        if query_params:
-            recipes_limit = int(query_params)
-        else:
-            recipes_limit = recipes_count
-        recipes = Recipe.objects.filter(author=obj)[:recipes_limit]
-        serializer = serializers.ListSerializer(child=RecipeSerializer())
-        return serializer.data
-
     def get_recipes_count(self, obj):
-        recipes_count = obj.recipes.count()
-        return recipes_count
+        return obj.recipes.count()

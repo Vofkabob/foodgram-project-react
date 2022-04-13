@@ -43,7 +43,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 else:
                     ingredients_dict[key] += ingredients_amount
         return ingredients_dict
-    
+
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
