@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           file: .backend/foodgram_project/Dockerfile
-          tags: sergeev90/foodgram_project:v1.04.22
+          tags: sergeev90/foodgram_project:latest
 
   deploy:
     runs-on: ubuntu-latest
