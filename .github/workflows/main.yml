@@ -51,7 +51,7 @@ jobs:
         with:
           push: true
           context: frontend/
-          file: Dockerfile
+          file: ./Dockerfile
           tags: sergeev90/foodgram_frontend:latest
 
   deploy:
