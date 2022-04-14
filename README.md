@@ -1,5 +1,4 @@
-
-
+![example workflow](https://github.com/Vofkabob/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 ### Проект Foodgram
 
@@ -7,21 +6,27 @@
 
 Добро пожаловать в "Foodgram", сервис, где вы сможете хранить свои рецепты. Помимо этого, в "Foodgram" вы сможете просматривать рецепты других пользователей, добавлять их в избранное или в список покупок, который можно скачать.
 
-## Для установки проекта (инструкция для Windows):
+## Для установки проекта следуйте инструкциям ниже по порядку
 
-Скопируйте репозиторий
+Скопируйте репозиторий:
 ```
 git clone https://github.com/Vofkabob/yamdb_final.git
 ```
 
-Создайте и разверните виртуальное окружение, установите зависимости
-```
-python -m venv venv или python3 -m venv venv
-source venv/Scripts/activate
-pip install requirements.txt
-```
+# Действия на сервере
 
-Создайте файл .env в директории infra/ и внестите в него данные
+- Зайдите на ваш удалённый сервер и проверьте установку docker:
+```
+sudo apt install docker.io 
+```
+- *Если программа не установлена, то произойдёт загрузка. Есть такая программа уже имеется, Вы получите соответствуещее сообщение.
+
+- Скопируйте файлы docker-compose.yml и nginx.conf из директории infra на сервер (либо командой scp либо можете создать файлы на сервере и скопировать туда данные).
+
+# Действия локально
+
+- Отредактируйте файл infra/nginx.conf и в строке server_name впишите свой IP.
+- Создайте файл .env в директории infra/ и внестите в него данные:
 ```
 DB_ENGINE=django.db.backends.postgresql
 DB_NAME=django_db
@@ -31,30 +36,60 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
-Соберите статику
+# Действия в GitHub
+
+- Чтобы workflow работал корректно, добавьте ключи в настройках GitHub - Settings/Secrets/Actions:
 ```
-python manage.py collectstatic
+DOCKER_USERNAME=<имя пользователя DockerHub>
+DOCKER_PASSWORD=<пароль от DockerHub>
+
+USER=<username для подключения к серверу>
+HOST=<IP сервера>
+PASSPHRASE=<пароль для сервера, если он установлен>
+SSH_KEY=<ваш SSH ключ (для его получения команда: cat ~/.ssh/id_rsa)>
+
+TELEGRAM_TO=<ID чата, в который придет сообщение> - его можно узнать у бота @userinfobot
+TELEGRAM_TOKEN=<токен вашего бота> - его можно узнать у бота @BotFather
 ```
 
-Запустите docker-compose
-```
-docker-compose up --build
-```
+# Действия на сервере
 
-Проверьте, что запущены 3 контейнера в одном образе: nginx, db, frontend. Контейнер frontend будет неактивным, так и должно быть.
-
-Далее перейдите в директорию с файлом manage.py (foodgram-project-react\backend\foodgram_project)
-
-Запустите проект
+- Соберите docker-compose:
 ```
-python manage.py runserver
+sudo docker-compose up -d --build
 ```
 
-*К описанию добавятся настройки удалённого сервера после первого ревью*
+- После первого деплоя и сборки выполните команды:
+
+Сбор статики:
+```
+sudo docker-compose exec backend python manage.py collectstatic --noinput
+```
+
+Применение миграций:
+```
+sudo docker-compose exec backend python manage.py migrate --noinput
+```
+
+Создание суперпользователя:
+```
+sudo docker-compose exec backend python manage.py createsuperuser
+```
+
+Проверьте, что запущены 3 контейнера в одном образе: nginx, db, backend. Контейнер frontend будет неактивным, так и должно быть.
+
+Чтобы заполнить базу данных начальными данными списка ингридиетов выполните:
+```
+sudo docker-compose exec backend python manage.py loaddata data/ingredients.json
+```
 
 ## Страниц проекта:
 
-Foodgram будет доступен по ссылке - http://localhost/recipes
+Foodgram будет доступен по ссылке - http://<Ваш_IP>/
+
+Мой Foodgram для примера - http://84.201.178.224/
+user: admin90
+password: password
 
 ## Автор:
 
