@@ -41,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v2 
         with:
           push: true
+          file: .backend/foodgram_project/Dockerfile
           tags: sergeev90/foodgram_project:v1.04.22
 
   deploy:
