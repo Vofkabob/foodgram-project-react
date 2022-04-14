@@ -42,7 +42,7 @@ jobs:
         with:
           push: true
           context: backend/
-          file: foodgram_project/Dockerfile
+          file: ./backend/foodgram_project/Dockerfile
           tags: sergeev90/foodgram_project:latest
 
   deploy:
