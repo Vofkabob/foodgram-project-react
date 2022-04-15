@@ -83,7 +83,7 @@ sudo docker-compose exec backend python manage.py createsuperuser
 
 Чтобы заполнить базу данных начальными данными списка ингридиетов выполните:
 ```
-sudo docker-compose exec backend python manage.py loaddata data/ingredients.json
+sudo docker-compose exec backend python manage.py load_data
 ```
 
 
