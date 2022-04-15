@@ -94,6 +94,6 @@ Foodgram будет доступен по ссылке - http://<Ваш_IP>/
 user: admin90
 password: password
 
-## Автор:
+### Автор:
 
 Сергеев Владимир - https://github.com/Vofkabob
