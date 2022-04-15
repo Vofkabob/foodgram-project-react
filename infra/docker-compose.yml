@@ -16,7 +16,7 @@ services:
       - db
 
   backend:
-    image: sergeev90/foodgram_project:v1.04.22
+    image: sergeev90/foodgram_project:v2.04.22
     restart: always
     volumes:
       - static_value:/var/html/static/
