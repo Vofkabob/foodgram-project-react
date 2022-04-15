@@ -86,6 +86,7 @@ sudo docker-compose exec backend python manage.py createsuperuser
 sudo docker-compose exec backend python manage.py loaddata data/ingredients.json
 ```
 
+
 ## Страниц проекта:
 
 Foodgram будет доступен по ссылке - http://<Ваш_IP>/
