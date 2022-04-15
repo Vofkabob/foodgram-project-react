@@ -52,7 +52,7 @@ jobs:
           push: true
           context: frontend/
           file: ./frontend/Dockerfile
-          tags: sergeev90/foodgram_frontend:latest
+          tags: sergeev90/foodgram_frontend:v1.04.22
 
   deploy:
     runs-on: ubuntu-latest
