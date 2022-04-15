@@ -3,6 +3,7 @@
 [![Actions Status](https://github.com/Vofkabob/foodgram-project-react/workflows/Django-app%20workflow/badge.svg)](https://github.com/Vofkabob/csp-generator/actions)
 
 
+
 ## Описание проекта:
 
 Добро пожаловать в "Foodgram", сервис, где вы сможете хранить свои рецепты. Помимо этого, в "Foodgram" вы сможете просматривать рецепты других пользователей, добавлять их в избранное или в список покупок, который можно скачать.
