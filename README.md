@@ -86,13 +86,16 @@ sudo docker-compose exec backend python manage.py createsuperuser
 sudo docker-compose exec backend python manage.py load_data
 ```
 
+## Действия в админке:
+
+Обязательно создайте теги "Завтрак", "Обед" и "Ужин" в панели администратора, иначе рецепты не будут добавляться.
 
 ## Страниц проекта:
 
 Foodgram будет доступен по ссылке - http://<Ваш_IP>/
 
 Мой Foodgram для примера - http://84.201.178.224/
-user: admin90
+email: sergeev90@ya.ru
 password: password
 
 ### Автор:
