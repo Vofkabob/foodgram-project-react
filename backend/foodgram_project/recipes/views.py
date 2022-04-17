@@ -113,6 +113,7 @@ class TagViewSet(ListRetriveViewSet):
 
 class FavouriteShoppingCartView(views.APIView):
     permission_classes = [IsAuthenticated]
+    filterset_class = RecipeFilterSet
     queryset = {
         'favourite': Favourite.objects,
         'shopping_cart': ShoppingCart.objects

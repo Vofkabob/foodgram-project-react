@@ -1,13 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from djoser.views import UserViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, views
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from django.shortcuts import get_list_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .paginator import LimitPageNumberPagination
+from recipes.mixins import ListViewSet
 from .models import Follow
 from .serializers import FollowSerializer
 
@@ -82,3 +85,13 @@ class FollowView(views.APIView):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+
+class FollowListView(ListViewSet):
+    serializer = FollowSerializer
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = [IsAuthenticated]
+    pagination_class = LimitPageNumberPagination
+
+    def get_queryset(self):
+        return get_list_or_404(User, following__user=self.request.user)

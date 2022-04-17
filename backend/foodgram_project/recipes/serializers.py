@@ -80,7 +80,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             ingredients = validated_data.pop('ingredients')
             recipe.ingredients.clear()
             ingredients = self.get_ingredients_list(ingredients, recipe)
-        recipe.save()
         return recipe
 
     def get_ingredients_list(self, ingredients, recipe_id):

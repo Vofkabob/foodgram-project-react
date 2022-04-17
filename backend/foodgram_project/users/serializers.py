@@ -1,5 +1,4 @@
 from drf_extra_fields.fields import Base64ImageField
-from django.shortcuts import get_list_or_404
 from djoser.conf import settings
 from djoser.serializers import (
     UserCreateSerializer as BaseUserRegistrationSerializer)
@@ -73,9 +72,6 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, subscribe):
         return subscribe.recipes.count()
-
-    def get_queryset(self):
-        return get_list_or_404(User, following__user=self.request.user)
 
 
 class FollowListSerializer(serializers.ModelSerializer):

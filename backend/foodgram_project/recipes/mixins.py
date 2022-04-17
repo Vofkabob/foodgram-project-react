@@ -4,3 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 
 class ListRetriveViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     pass
+
+
+class ListViewSet(ListModelMixin, GenericViewSet):
+    pass
