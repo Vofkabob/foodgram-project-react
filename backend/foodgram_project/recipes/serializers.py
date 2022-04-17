@@ -1,4 +1,3 @@
-from django.db.models import F
 from django.contrib.auth import get_user_model
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
@@ -66,43 +65,23 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.save()
         return recipe
 
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get('cooking_time',
-                                                   instance.cooking_time)
-        ingredients_data = validated_data.pop('ingredients_amount')
-        tags_data = validated_data.pop('tags')
-        if tags_data:
-            instance.tags.set(tags_data)
-        if ingredients_data:
-            ingredient = self.initial_data['ingredients']
-            ingredients = self.get_ingredients_list(
-                ingredient,
-                instance)
-            instance.ingredients_amount.set(ingredients)
-        instance.save()
-        return instance
-
-    def get_ingredients_list(self, ingredients, recipe_id):
-        ingredients_list = []
-        ingredients_to_delete = IngredientForRecipe.objects.filter(
-            recipe=recipe_id)
-        if ingredients_to_delete:
-            for ingredient in ingredients_to_delete:
-                ingredient.delete()
-        for ingredient in ingredients:
-            ingredient_id = ingredient['id']
-            amount = ingredient['amount']
-            ingredient_instance = Ingredient.objects.get(id=ingredient_id)
-            if (IngredientForRecipe.objects.
-               filter(recipe=recipe_id, ingredient_id=ingredient_id).exists()):
-                amount += F('amount')
-            ingredient, updated = IngredientForRecipe.objects.update_or_create(
-                recipe=recipe_id, ingredient=ingredient_instance,
-                defaults={'amount': amount})
-            ingredients_list.append(ingredient)
-        return ingredients_list
+    def update(self, recipe, validated_data):
+        recipe.name = validated_data.get('name', recipe.name)
+        recipe.text = validated_data.get('text', recipe.text)
+        recipe.cooking_time = validated_data.get(
+            'cooking_time', recipe.cooking_time)
+        recipe.image = validated_data.get(
+            'image', recipe.image)
+        if 'ingredients' in self.initial_data:
+            ingredients = validated_data.pop('ingredients')
+            recipe.ingredients.clear()
+            self.add_ingredients(ingredients, recipe)
+        if 'tags' in self.initial_data:
+            tags = validated_data.pop('tags')
+            recipe.tags.clear()
+            recipe.tags.set(tags)
+        recipe.save()
+        return
 
     class Meta:
         model = Recipe
