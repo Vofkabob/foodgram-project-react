@@ -55,32 +55,27 @@ class RecipeSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop('ingredients_amount')
-        tags = validated_data.pop('tags')
-        recipe = super().create(validated_data)
-        ingredients_amount = self.get_ingredients_list(
-            self.initial_data['ingredients'], recipe)
-        recipe.tags.set(tags)
-        recipe.ingredients_amount.set(ingredients_amount)
-        recipe.save()
+        image = validated_data.pop('image')
+        ingredients_data = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(image=image, **validated_data)
+        tags_data = self.initial_data.get('tags')
+        recipe.tags.set(tags_data)
+        self.create_ingredients(ingredients_data, recipe)
         return recipe
 
-    def update(self, recipe, validated_data):
-        recipe.name = validated_data.get('name', recipe.name)
-        recipe.text = validated_data.get('text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time)
-        recipe.image = validated_data.get(
-            'image', recipe.image)
-        if 'ingredients' in self.initial_data:
-            ingredients = validated_data.pop('ingredients')
-            recipe.ingredients.clear()
-            self.add_ingredients(ingredients, recipe)
-        if 'tags' in self.initial_data:
-            tags = validated_data.pop('tags')
-            recipe.tags.clear()
-            recipe.tags.set(tags)
-        recipe.save()
+    def update(self, instance, validated_data):
+        instance.image = validated_data.get('image', instance.image)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.tags.clear()
+        tags_data = self.initial_data.get('tags')
+        instance.tags.set(tags_data)
+        IngredientForRecipe.objects.filter(recipe=instance).all().delete()
+        self.create_ingredients(validated_data.get('ingredients'), instance)
+        instance.save()
         return
 
     class Meta:
