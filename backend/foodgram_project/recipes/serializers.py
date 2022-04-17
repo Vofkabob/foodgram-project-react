@@ -79,7 +79,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if 'ingredient' in self.initial_data:
             ingredients = validated_data.pop('ingredients')
             recipe.ingredients.clear()
-            ingredients(ingredients, recipe)
+            ingredients = self.get_ingredients_list(ingredients, recipe)
         recipe.save()
         return recipe
 
