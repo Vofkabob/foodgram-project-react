@@ -1,11 +1,10 @@
 from drf_extra_fields.fields import Base64ImageField
-from djoser.conf import settings
 from djoser.serializers import (
     UserCreateSerializer as BaseUserRegistrationSerializer)
-from rest_framework import serializers, validators
+from rest_framework import serializers
 
 from recipes.models import Recipe
-from .models import Follow, User
+from .models import User, Follow
 
 
 class UserRegistrationSerializer(BaseUserRegistrationSerializer):
@@ -18,23 +17,22 @@ class UserRegistrationSerializer(BaseUserRegistrationSerializer):
 
 class CustomUserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
-    username = serializers.CharField(
-        required=True,
-        validators=[validators.UniqueValidator(
-            queryset=User.objects.all()
-        )])
 
     class Meta:
         model = User
-        fields = (settings.LOGIN_FIELD, 'id',
-                  'username', 'first_name', 'last_name', 'is_subscribed')
-        read_only_fields = (settings.LOGIN_FIELD, )
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
+        user = self.context.get('request').user
+        if user.is_anonymous:
             return False
-        return obj.following.filter(user=request.user).exists()
+        return Follow.objects.filter(user=user, author=obj).exists()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -49,49 +47,27 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    recipes = RecipeSerializer(many=True)
-    recipes_count = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count')
-        read_only_fields = ('email', 'id', 'username', 'first_name',
-                            'last_name', 'is_subscribed', 'recipes',
-                            'recipes_count')
-
-    def get_is_subscribed(self, subscribe):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return Follow.objects.filter(
-                user=user,
-                subscribe=subscribe
-            ).exists()
-        return False
-
-    def get_recipes_count(self, subscribe):
-        return subscribe.recipes.count()
-
-
-class FollowListSerializer(serializers.ModelSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-    recipes_count = serializers.SerializerMethodField()
-    recipes = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count',)
+                  'recipes', 'recipes_count')
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
+        user = self.context.get('request').user
+        if user.is_anonymous:
             return False
-        user = request.user
-        return Follow.objects.filter(
-            user=user,
-            subscriptions=obj).exists()
+        return Follow.objects.filter(user=user, author=obj).exists()
 
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        return Recipe.objects.filter(author=obj).count()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        limit = request.GET.get('recipes_limit')
+        queryset = Recipe.objects.filter(author=obj)
+        if limit:
+            queryset = queryset[:int(limit)]
+        return RecipeSerializer(queryset, many=True).data
