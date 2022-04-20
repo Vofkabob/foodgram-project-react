@@ -26,6 +26,7 @@ sudo apt install docker.io
 
 - Скопируйте файлы docker-compose.yml и nginx.conf из директории infra на сервер (либо командой scp либо можете создать файлы на сервере и скопировать туда данные).
 
+
 ### Действия локально
 
 - Отредактируйте файл infra/nginx.conf и в строке server_name впишите свой IP.
