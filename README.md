@@ -40,6 +40,7 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
+
 ### Действия в GitHub
 
 - Чтобы workflow работал корректно, добавьте ключи в настройках GitHub - Settings/Secrets/Actions:
