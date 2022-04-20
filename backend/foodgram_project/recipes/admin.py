@@ -14,9 +14,21 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+class IngredientRecipeInline(admin.TabularInline):
+    model = IngredientForRecipe
+
+
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author')
+    inlines = [
+        IngredientRecipeInline,
+    ]
+    list_display = ('id', 'name', 'author', 'get_ingredients')
     list_filter = ('name', 'author', 'tags')
+
+    def get_ingredients(self, obj):
+        return '\n'.join(
+            [str(ingredients) for ingredients in obj.ingredients.all()]
+        )
 
 
 class IngredientForRecipeAdmin(admin.ModelAdmin):
