@@ -27,8 +27,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def get_ingredients(self, obj):
         return '\n'.join(
-            [str(ingredients) for ingredients in obj.ingredients.all()]
-        )
+            [str(ingredients) for ingredients in obj.ingredients.all()])
 
 
 class IngredientForRecipeAdmin(admin.ModelAdmin):
